@@ -5,6 +5,9 @@
   "author": "Nader Alzghoul",
   "license": "MIT",
   "private": true,
+  "engines": {
+    "node": ">=20.19.0"
+  },
   "type": "commonjs",
   "scripts": {
     "test": "playwright test",

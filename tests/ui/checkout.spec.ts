@@ -1,5 +1,5 @@
 import { test, expect } from '../../fixtures/ui';
-import { products } from '../../data/products';
+import { orderTotal, products } from '../../data/products';
 import { checkoutCustomer } from '../../data/users';
 
 test.describe('Checkout', () => {
@@ -16,8 +16,9 @@ test.describe('Checkout', () => {
 
     await checkoutPage.fillCustomer(checkoutCustomer);
     await expect(page).toHaveURL(/checkout-step-two/);
-    // 29.99 item total + 8% tax (2.40) = 32.39
-    await expect(checkoutPage.summaryTotal).toHaveText('Total: $32.39');
+    await expect(checkoutPage.summaryTotal).toHaveText(
+      `Total: $${orderTotal(products.backpack.price)}`,
+    );
 
     await checkoutPage.finish();
     await expect(checkoutPage.confirmationHeader).toHaveText('Thank you for your order!');

@@ -1,4 +1,5 @@
 import { test, expect } from '../../fixtures/ui';
+import { products } from '../../data/products';
 
 const alphabetical = (a: string, b: string) => a.localeCompare(b);
 
@@ -33,7 +34,7 @@ test.describe('Sorting', () => {
         return prices.join() === [...prices].sort((a, b) => a - b).join();
       })
       .toBe(true);
-    expect((await inventoryPage.prices())[0]).toBe(7.99);
+    expect((await inventoryPage.prices())[0]).toBe(products.onesie.price);
   });
 
   test('price high to low', async ({ inventoryPage }) => {
@@ -44,6 +45,6 @@ test.describe('Sorting', () => {
         return prices.join() === [...prices].sort((a, b) => b - a).join();
       })
       .toBe(true);
-    expect((await inventoryPage.prices())[0]).toBe(49.99);
+    expect((await inventoryPage.prices())[0]).toBe(products.fleeceJacket.price);
   });
 });

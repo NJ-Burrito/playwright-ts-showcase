@@ -11,7 +11,7 @@ A small Playwright + TypeScript test project by Nader Alzghoul (QA Automation En
 
 ## What it tests
 
-24 tests in total (measured with `npm test`): 1 setup test, 13 UI tests and 10 API tests.
+26 tests in total (measured with `npm test`): 1 setup test, 13 UI tests and 12 API tests.
 
 - **Login (5):** valid user, locked-out user, wrong password, empty form, protected page without a session.
 - **Cart (2):** add items and see the badge and cart page update; remove an item.
@@ -19,11 +19,11 @@ A small Playwright + TypeScript test project by Nader Alzghoul (QA Automation En
 - **Checkout (2):** happy path to the confirmation page (including the order total), and the missing first name error.
 - **Accessibility (1):** an axe-core scan of the product page; it fails on critical or serious WCAG A/AA violations. It is a guard, not a full accessibility audit.
 - **API auth (2):** token for valid credentials; no token for bad credentials.
-- **API bookings (8):** create, get, get unknown id (404), list with a filter, full update (PUT), partial update (PATCH), update without a token (403), delete then confirm 404. Responses are checked for field names and types, not only status codes.
+- **API bookings (10):** create, create with an invalid payload (the API answers 500), get, get unknown id (404), list with a filter, full update (PUT), partial update (PATCH), update without a token (403), delete without a token (403), delete then confirm 404. Responses are checked for field names and types, not only status codes.
 
 ## How to run
 
-Requires Node.js 20 or newer.
+Requires Node.js 20.19 or newer (CI runs 24).
 
 ```bash
 npm ci
@@ -51,7 +51,7 @@ tests/
 
 ## Design choices
 
-- **Page Object Model.** Each page class owns its locators and exposes actions (`login`, `addToCart`, `sortBy`). Specs read as steps and hold the assertions. When the UI changes, one file changes.
+- **Page Object Model.** Each page class owns its locators and exposes actions (`login`, `addToCart`, `sortBy`). Page classes own locators and actions; specs hold the business assertions. Pages keep only small guard assertions (the page has loaded, an error is shown). When the UI changes, one file changes.
 - **Custom fixtures.** Specs ask for `loginPage`, `inventoryPage` and so on in their arguments instead of creating them. The API fixtures give each test its own booking and delete it afterwards, so parallel tests never share or depend on each other's data.
 - **storageState.** A `setup` project logs in once and saves the session to `.auth/standard-user.json`. The `chromium` project depends on it and starts every test already logged in. Login tests opt out with an empty state.
 - **Locator strategy.** Role, label and placeholder first (`getByRole`, `getByPlaceholder`), then test ids (`getByTestId`, configured to saucedemo's `data-test` attribute) where the page gives no accessible handle. No CSS or XPath chains.

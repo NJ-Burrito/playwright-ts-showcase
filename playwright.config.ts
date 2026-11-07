@@ -1,7 +1,10 @@
 import { defineConfig, devices } from '@playwright/test';
+import { API_BASE_URL, STORAGE_STATE, UI_BASE_URL } from './config/constants';
 
 const isCI = !!process.env.CI;
-export const STORAGE_STATE = '.auth/standard-user.json';
+
+// The setup and UI projects share one target, so the baseURL is defined once.
+const uiTarget = { baseURL: UI_BASE_URL };
 
 export default defineConfig({
   testDir: './tests',
@@ -19,23 +22,19 @@ export default defineConfig({
     {
       name: 'setup',
       testMatch: /auth\.setup\.ts/,
-      use: { baseURL: 'https://www.saucedemo.com' },
+      use: { ...uiTarget },
     },
     {
       name: 'chromium',
       testMatch: /ui\/.*\.spec\.ts/,
       dependencies: ['setup'],
-      use: {
-        ...devices['Desktop Chrome'],
-        baseURL: 'https://www.saucedemo.com',
-        storageState: STORAGE_STATE,
-      },
+      use: { ...devices['Desktop Chrome'], ...uiTarget, storageState: STORAGE_STATE },
     },
     {
       name: 'api',
       testMatch: /api\/.*\.spec\.ts/,
       use: {
-        baseURL: 'https://restful-booker.herokuapp.com',
+        baseURL: API_BASE_URL,
         extraHTTPHeaders: { Accept: 'application/json' },
       },
     },

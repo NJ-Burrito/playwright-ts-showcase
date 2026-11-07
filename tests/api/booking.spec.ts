@@ -15,11 +15,31 @@ test.describe('Booking CRUD', () => {
     const payload = newBooking({ firstname: 'Create', totalprice: 321 });
     const { id, body } = await createBooking(request, payload);
 
-    expect(id).toBeGreaterThan(0);
-    expect(body.booking).toMatchObject(payload);
-    expect(body.booking).toMatchObject(bookingShape);
+    try {
+      expect(id).toBeGreaterThan(0);
+      expect(body.booking).toMatchObject(payload);
+      expect(body.booking).toMatchObject(bookingShape);
+    } finally {
+      // Always clean up, even when an assertion above fails.
+      await request.delete(`/booking/${id}`, { headers: { Cookie: `token=${token}` } });
+    }
+  });
 
-    await request.delete(`/booking/${id}`, { headers: { Cookie: `token=${token}` } });
+  test('create with an invalid payload is rejected', async ({ request }) => {
+    const res = await request.post('/booking', { data: { firstname: 'OnlyOneField' } });
+    // Measured against the live API: it answers 500, not 400, for a payload missing required fields.
+    expect(res.status()).toBe(500);
+  });
+
+  test('delete without a token is forbidden and keeps the booking', async ({
+    request,
+    booking,
+  }) => {
+    const del = await request.delete(`/booking/${booking.id}`);
+    expect(del.status()).toBe(403);
+
+    const after = await request.get(`/booking/${booking.id}`);
+    expect(after.status()).toBe(200);
   });
 
   test('get returns the stored booking', async ({ request, booking }) => {

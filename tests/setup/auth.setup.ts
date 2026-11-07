@@ -1,5 +1,5 @@
 import { test as setup, expect } from '@playwright/test';
-import { STORAGE_STATE } from '../../playwright.config';
+import { STORAGE_STATE } from '../../config/constants';
 import { users } from '../../data/users';
 import { LoginPage } from '../../pages/LoginPage';
 
